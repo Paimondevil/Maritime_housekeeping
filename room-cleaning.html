@@ -120,6 +120,8 @@
   }
   .chip.full{background:var(--gold-bg);border-color:var(--gold);color:#5c3f10;}
   .chip.stay{background:var(--teal-bg);border-color:var(--teal);color:#173e3a;}
+  .chip.priority{background:#3c1414;border-color:#7a1f1f;color:#fff;}
+  .chip.priority .tag{opacity:1;color:#ffb3b3;}
 
   .actions{
     display:flex;
@@ -150,81 +152,123 @@
     border-radius:12px;
     padding:30px 32px;
   }
-  .sheet h1{
+  .sheet-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    border-bottom:1.5px solid var(--line-strong);
+    padding-bottom:3px;
+    margin-bottom:5px;
+  }
+  .sheet-head .name{
     font-family:'Fraunces',serif;
-    font-size:22px;
-    margin:0 0 2px;
+    font-weight:700;
+    font-size:15px;
     color:var(--navy);
   }
-  .sheet .meta{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:13px;
+  .sheet-head .name span{
+    font-family:'Inter',sans-serif;
+    font-weight:500;
+    font-size:12px;
     color:var(--navy-dim);
-    margin-bottom:22px;
+  }
+  .sheet-head .date{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--navy-dim);
+    font-weight:600;
   }
   .block-title{
     font-family:'Fraunces',serif;
     font-weight:700;
-    font-size:18px;
-    letter-spacing:0.03em;
-    padding:8px 14px;
-    border-radius:6px;
-    margin:26px 0 12px;
+    font-size:12.5px;
+    letter-spacing:0.02em;
+    padding:3px 9px;
+    border-radius:5px;
+    margin:0 0 4px;
   }
+  .block-title.stay{margin-top:7px;}
   .block-title.full{background:var(--gold-bg);color:#5c3f10;}
   .block-title.stay{background:var(--teal-bg);color:#173e3a;}
-  .type-heading{
-    font-family:'Inter',sans-serif;
-    font-weight:700;
-    font-size:13px;
-    text-transform:uppercase;
-    letter-spacing:0.06em;
-    color:var(--navy-dim);
-    margin:16px 0 6px;
-    padding-bottom:4px;
-    border-bottom:1px solid var(--line);
-  }
   table.roomtable{
     width:100%;
     border-collapse:collapse;
-    margin-bottom:4px;
-    page-break-inside:avoid;
+    margin-bottom:2px;
+    table-layout:fixed;
+  }
+  table.roomtable th, table.roomtable td{
+    border-right:1px solid var(--line);
+  }
+  table.roomtable th:last-child, table.roomtable td:last-child{
+    border-right:none;
   }
   table.roomtable th{
     text-align:left;
-    font-size:11px;
+    font-size:9px;
     font-weight:600;
     text-transform:uppercase;
-    letter-spacing:0.04em;
+    letter-spacing:0.03em;
     color:var(--navy-dim);
-    padding:6px 8px;
+    padding:3px 7px;
     border-bottom:1.5px solid var(--line-strong);
   }
   table.roomtable td{
     font-family:'IBM Plex Mono',monospace;
-    font-size:13px;
-    padding:10px 8px;
+    font-size:15px;
+    padding:3.5px 7px;
     border-bottom:1px solid var(--line);
+    line-height:1.15;
+  }
+  table.roomtable tr{page-break-inside:avoid;}
+  table.roomtable td.typecell{
+    font-family:'Inter',sans-serif;
+    font-weight:700;
+    font-size:9px;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+    color:var(--navy-dim);
+    vertical-align:top;
+    padding-top:4.5px;
   }
   table.roomtable td.roomno{font-weight:700;color:var(--ink);}
+  table.roomtable td.prioritycell{font-weight:700;color:#7a1f1f;text-align:center;}
   .blank-cell{color:transparent;}
   .empty-note{
-    font-size:13px;
+    font-size:11px;
     color:var(--navy-dim);
     font-style:italic;
-    padding:8px 4px 18px;
+    padding:4px 4px 10px;
   }
 
+  .notes-box{
+    margin-top:6px;
+    border:1.5px solid var(--line-strong);
+    border-radius:6px;
+    padding:4px 10px 5px;
+  }
+  .notes-box .label{
+    font-family:'Inter',sans-serif;
+    font-weight:700;
+    font-size:9px;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:var(--navy-dim);
+    margin-bottom:3px;
+  }
+  .notes-box .space{
+    height:45px;
+  }
+  @page{ size: auto; margin: 4mm; }
   @media print{
     body{background:#fff;}
     .no-print{display:none !important;}
     #setupView{display:none !important;}
     #sheetView{display:block !important;}
-    header.top{background:#fff;color:var(--ink);padding:0 0 10px;}
-    header.top .sub, #dateLabel{color:var(--navy-dim);}
+    header.top{display:none !important;}
     .wave{display:none;}
     main{padding:0;max-width:100%;}
     .sheet{border:none;padding:0;}
+    .sheet-head{font-size:14px;margin-bottom:8px;}
   }
   @media (max-width:560px){
     header.top h1{font-size:22px;}
@@ -259,11 +303,23 @@
 
     <div class="actions no-print">
       <button class="btn ghost" onclick="resetAll()">Reset all rooms</button>
+      <button class="btn primary" onclick="goToPriority()">Generate sheet →</button>
+    </div>
+  </div>
+
+  <div id="priorityView" style="display:none;">
+    <div class="legend">
+      <span><span class="dot" style="background:#3c1414;"></span>Tap a Full Clean room to mark it Priority</span>
+      <span class="hint">Priority = booked for tomorrow, clean these first</span>
+    </div>
+    <div id="priorityCards"></div>
+    <div class="actions no-print">
+      <button class="btn ghost" onclick="backToSetup()">← Back</button>
       <button class="btn primary" onclick="showSheet()">Generate sheet →</button>
     </div>
   </div>
 
-  <div id="sheetView">
+  <div id="sheetView" style="display:none;">
     <div class="sheet" id="sheetContent"></div>
     <div class="actions no-print" style="margin-top:20px;">
       <button class="btn ghost" onclick="backToSetup()">← Edit assignments</button>
@@ -287,7 +343,12 @@
   const status = {};
   ROOM_TYPES.forEach(t => t.rooms.forEach(r => status[r] = 0));
 
+  // priority: true = booked for tomorrow, clean first (Full Clean rooms only)
+  const priority = {};
+  ROOM_TYPES.forEach(t => t.rooms.forEach(r => priority[r] = false));
+
   const typeCardsEl = document.getElementById('typeCards');
+  const priorityCardsEl = document.getElementById('priorityCards');
 
   function render(){
     typeCardsEl.innerHTML = '';
@@ -312,23 +373,82 @@
   }
 
   function resetAll(){
-    ROOM_TYPES.forEach(t => t.rooms.forEach(r => status[r] = 0));
+    ROOM_TYPES.forEach(t => t.rooms.forEach(r => { status[r] = 0; priority[r] = false; }));
     render();
   }
 
-  function buildBlock(label, code, cssClass){
-    let html = `<div class="block-title ${cssClass}">${label}</div>`;
-    let any = false;
+  function renderPriorityCards(){
+    priorityCardsEl.innerHTML = '';
     ROOM_TYPES.forEach(type => {
-      const matches = type.rooms.filter(r => status[r] === code);
-      if(matches.length === 0) return;
-      any = true;
-      html += `<div class="type-heading">${type.name}</div>`;
+      const fullRooms = type.rooms.filter(r => status[r] === 1);
+      if(fullRooms.length === 0) return;
+      const card = document.createElement('div');
+      card.className = 'type-card';
+      const h2 = document.createElement('h2');
+      h2.textContent = type.name;
+      card.appendChild(h2);
+      const grid = document.createElement('div');
+      grid.className = 'chip-grid';
+      fullRooms.forEach(room => {
+        const chip = document.createElement('div');
+        chip.className = 'chip' + (priority[room] ? ' priority' : '');
+        chip.innerHTML = room + (priority[room] ? '<span class="tag">PRIORITY</span>' : '');
+        chip.onclick = () => { priority[room] = !priority[room]; renderPriorityCards(); };
+        grid.appendChild(chip);
+      });
+      card.appendChild(grid);
+      priorityCardsEl.appendChild(card);
+    });
+    if(!priorityCardsEl.children.length){
+      priorityCardsEl.innerHTML = '<div class="empty-note">No Full Clean rooms assigned tonight — nothing to prioritize.</div>';
+    }
+  }
+
+  function goToPriority(){
+    const anyFull = ROOM_TYPES.some(t => t.rooms.some(r => status[r] === 1));
+    if(!anyFull){
+      showSheet();
+      return;
+    }
+    renderPriorityCards();
+    document.getElementById('setupView').style.display = 'none';
+    document.getElementById('priorityView').style.display = 'block';
+    window.scrollTo(0,0);
+  }
+
+  function buildBlock(label, code, cssClass, showPriority){
+    // Collect matching rooms grouped by type, type shown once as a rowspan side-label
+    const groups = ROOM_TYPES
+      .map(type => ({ name: type.name, rooms: type.rooms.filter(r => status[r] === code) }))
+      .filter(g => g.rooms.length > 0);
+
+    let html = `<div class="block-title ${cssClass}">${label}</div>`;
+
+    if(groups.length === 0){
+      html += `<div class="empty-note">No rooms assigned to ${label.toLowerCase()} tonight.</div>`;
+      return html;
+    }
+
+    if(showPriority){
       html += `<table class="roomtable"><thead><tr>
-        <th>Room No</th><th>Housekeeper Name</th><th>Completed</th><th>Supervisor Check</th><th>Signature</th>
+        <th style="width:10%;">Type</th><th style="width:5%;">P</th><th style="width:6%;">Room</th><th style="width:27%;">Housekeeper</th><th style="width:7%;">Done</th><th style="width:9%;">Supv.</th><th>Signature</th>
       </tr></thead><tbody>`;
-      matches.forEach(r => {
-        html += `<tr>
+    } else {
+      html += `<table class="roomtable"><thead><tr>
+        <th style="width:11%;">Type</th><th style="width:6%;">Room</th><th style="width:30%;">Housekeeper</th><th style="width:7%;">Done</th><th style="width:9%;">Supv.</th><th>Signature</th>
+      </tr></thead><tbody>`;
+    }
+
+    groups.forEach(g => {
+      g.rooms.forEach((r, i) => {
+        html += `<tr>`;
+        if(i === 0){
+          html += `<td class="typecell" rowspan="${g.rooms.length}">${g.name}</td>`;
+        }
+        if(showPriority){
+          html += `<td class="prioritycell">${priority[r] ? 'P' : ''}</td>`;
+        }
+        html += `
           <td class="roomno">${r}</td>
           <td class="blank-cell">&nbsp;</td>
           <td class="blank-cell">&nbsp;</td>
@@ -336,27 +456,34 @@
           <td class="blank-cell">&nbsp;</td>
         </tr>`;
       });
-      html += `</tbody></table>`;
     });
-    if(!any){
-      html += `<div class="empty-note">No rooms assigned to ${label.toLowerCase()} tonight.</div>`;
-    }
+
+    html += `</tbody></table>`;
     return html;
   }
 
   function showSheet(){
-    const today = new Date().toLocaleDateString('en-CA', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-    let html = `<h1>Maritime Inn Antigonish</h1><div class="meta">Housekeeping Room Cleaning Log — ${today}</div>`;
-    html += buildBlock('Full Clean', 1, 'full');
-    html += buildBlock('Stay Clean', 2, 'stay');
+    const today = new Date().toLocaleDateString('en-CA', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+    let html = `<div class="sheet-head">
+      <div class="name">Maritime Inn Antigonish: <span>Housekeeping List</span></div>
+      <div class="date">${today}</div>
+    </div>`;
+    html += buildBlock('Full Clean', 1, 'full', true);
+    html += buildBlock('Stay Clean', 2, 'stay', false);
+    html += `<div class="notes-box">
+      <div class="label">Notes</div>
+      <div class="space"></div>
+    </div>`;
     document.getElementById('sheetContent').innerHTML = html;
     document.getElementById('setupView').style.display = 'none';
+    document.getElementById('priorityView').style.display = 'none';
     document.getElementById('sheetView').style.display = 'block';
     window.scrollTo(0,0);
   }
 
   function backToSetup(){
     document.getElementById('sheetView').style.display = 'none';
+    document.getElementById('priorityView').style.display = 'none';
     document.getElementById('setupView').style.display = 'block';
   }
 
