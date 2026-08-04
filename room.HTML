@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maritime Inn Antigonish — Room Cleaning Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #f7f5f0;
+    --paper: #ffffff;
+    --ink: #1c2b36;
+    --navy: #16324f;
+    --navy-dim: #3c5771;
+    --gold: #b8873a;
+    --gold-bg: #f3e6cf;
+    --teal: #2f6e68;
+    --teal-bg: #dcece9;
+    --line: #dcd6c8;
+    --line-strong: #b9b09a;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wave{
+    height:14px;
+    width:100%;
+    background:
+      radial-gradient(circle at 10px -6px, transparent 12px, var(--navy) 12px) 0 0/28px 20px repeat-x;
+  }
+  header.top{
+    background:var(--navy);
+    color:#f7f5f0;
+    padding:28px 24px 20px;
+  }
+  header.top .inner{
+    max-width:980px;
+    margin:0 auto;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  header.top h1{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:28px;
+    margin:0;
+    letter-spacing:0.2px;
+  }
+  header.top .sub{
+    font-size:13px;
+    color:#c7d3dc;
+    margin-top:4px;
+    font-family:'IBM Plex Mono',monospace;
+  }
+  #dateLabel{font-weight:600;color:#fff;}
+  main{max-width:980px;margin:0 auto;padding:24px;}
+  .legend{
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+    align-items:center;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:14px 18px;
+    margin-bottom:24px;
+    font-size:14px;
+  }
+  .legend .dot{width:14px;height:14px;border-radius:4px;display:inline-block;margin-right:8px;vertical-align:-2px;}
+  .legend .hint{color:var(--navy-dim);font-size:13px;margin-left:auto;}
+  .type-card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:18px 20px 20px;
+    margin-bottom:18px;
+  }
+  .type-card h2{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:17px;
+    margin:0 0 14px;
+    color:var(--navy);
+  }
+  .chip-grid{display:flex;flex-wrap:wrap;gap:10px;}
+  .chip{
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:600;
+    font-size:15px;
+    min-width:64px;
+    padding:12px 10px;
+    text-align:center;
+    border-radius:8px;
+    border:2px solid var(--line-strong);
+    background:var(--paper);
+    color:var(--ink);
+    cursor:pointer;
+    user-select:none;
+    transition:transform .08s ease, box-shadow .12s ease;
+    position:relative;
+  }
+  .chip:active{transform:scale(0.96);}
+  .chip .tag{
+    display:block;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:10px;
+    letter-spacing:0.04em;
+    margin-top:3px;
+    opacity:0.85;
+  }
+  .chip.full{background:var(--gold-bg);border-color:var(--gold);color:#5c3f10;}
+  .chip.stay{background:var(--teal-bg);border-color:var(--teal);color:#173e3a;}
+
+  .actions{
+    display:flex;
+    gap:12px;
+    justify-content:flex-end;
+    margin:22px 0 40px;
+    flex-wrap:wrap;
+  }
+  button.btn{
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:14px;
+    padding:12px 20px;
+    border-radius:8px;
+    border:none;
+    cursor:pointer;
+  }
+  .btn.primary{background:var(--navy);color:#fff;}
+  .btn.primary:hover{background:#0f2438;}
+  .btn.ghost{background:transparent;color:var(--navy);border:1.5px solid var(--line-strong);}
+  .btn.ghost:hover{background:#eee9dd;}
+
+  /* ---- Print sheet view ---- */
+  #sheetView{display:none;}
+  .sheet{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:30px 32px;
+  }
+  .sheet h1{
+    font-family:'Fraunces',serif;
+    font-size:22px;
+    margin:0 0 2px;
+    color:var(--navy);
+  }
+  .sheet .meta{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    color:var(--navy-dim);
+    margin-bottom:22px;
+  }
+  .block-title{
+    font-family:'Fraunces',serif;
+    font-weight:700;
+    font-size:18px;
+    letter-spacing:0.03em;
+    padding:8px 14px;
+    border-radius:6px;
+    margin:26px 0 12px;
+  }
+  .block-title.full{background:var(--gold-bg);color:#5c3f10;}
+  .block-title.stay{background:var(--teal-bg);color:#173e3a;}
+  .type-heading{
+    font-family:'Inter',sans-serif;
+    font-weight:700;
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--navy-dim);
+    margin:16px 0 6px;
+    padding-bottom:4px;
+    border-bottom:1px solid var(--line);
+  }
+  table.roomtable{
+    width:100%;
+    border-collapse:collapse;
+    margin-bottom:4px;
+    page-break-inside:avoid;
+  }
+  table.roomtable th{
+    text-align:left;
+    font-size:11px;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    color:var(--navy-dim);
+    padding:6px 8px;
+    border-bottom:1.5px solid var(--line-strong);
+  }
+  table.roomtable td{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    padding:10px 8px;
+    border-bottom:1px solid var(--line);
+  }
+  table.roomtable td.roomno{font-weight:700;color:var(--ink);}
+  .blank-cell{color:transparent;}
+  .empty-note{
+    font-size:13px;
+    color:var(--navy-dim);
+    font-style:italic;
+    padding:8px 4px 18px;
+  }
+
+  @media print{
+    body{background:#fff;}
+    .no-print{display:none !important;}
+    #setupView{display:none !important;}
+    #sheetView{display:block !important;}
+    header.top{background:#fff;color:var(--ink);padding:0 0 10px;}
+    header.top .sub, #dateLabel{color:var(--navy-dim);}
+    .wave{display:none;}
+    main{padding:0;max-width:100%;}
+    .sheet{border:none;padding:0;}
+  }
+  @media (max-width:560px){
+    header.top h1{font-size:22px;}
+    .chip{min-width:56px;padding:10px 6px;font-size:14px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="inner">
+    <div>
+      <h1>Maritime Inn Antigonish</h1>
+      <div class="sub">Housekeeping Room Cleaning Log</div>
+    </div>
+    <div class="sub">Tonight: <span id="dateLabel"></span></div>
+  </div>
+</header>
+<div class="wave"></div>
+
+<main>
+
+  <div id="setupView">
+    <div class="legend">
+      <span><span class="dot" style="background:var(--gold);"></span>Tap once — Full Clean</span>
+      <span><span class="dot" style="background:var(--teal);"></span>Tap twice — Stay Clean</span>
+      <span><span class="dot" style="background:var(--paper);border:2px solid var(--line-strong);"></span>Tap again — Not assigned</span>
+      <span class="hint">Tap a room number to cycle its status</span>
+    </div>
+
+    <div id="typeCards"></div>
+
+    <div class="actions no-print">
+      <button class="btn ghost" onclick="resetAll()">Reset all rooms</button>
+      <button class="btn primary" onclick="showSheet()">Generate sheet →</button>
+    </div>
+  </div>
+
+  <div id="sheetView">
+    <div class="sheet" id="sheetContent"></div>
+    <div class="actions no-print" style="margin-top:20px;">
+      <button class="btn ghost" onclick="backToSetup()">← Edit assignments</button>
+      <button class="btn primary" onclick="window.print()">Print / Save as PDF</button>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  // Room roster — constant, grouped by room type as used on the printed log
+  const ROOM_TYPES = [
+    { name: "Select King",    rooms: [103,105,107,109,111,113,115] },
+    { name: "Pre King",       rooms: [216,217,218] },
+    { name: "Select Queen",   rooms: [104,106,108,110,112,114,116,214,215] },
+    { name: "Select Double",  rooms: [201,202,203,204,205,206,207,208,209,210,211,212] },
+    { name: "Executive Suite",rooms: [213] },
+  ];
+
+  // status: 0 = unassigned, 1 = Full Clean, 2 = Stay Clean
+  const status = {};
+  ROOM_TYPES.forEach(t => t.rooms.forEach(r => status[r] = 0));
+
+  const typeCardsEl = document.getElementById('typeCards');
+
+  function render(){
+    typeCardsEl.innerHTML = '';
+    ROOM_TYPES.forEach(type => {
+      const card = document.createElement('div');
+      card.className = 'type-card';
+      const h2 = document.createElement('h2');
+      h2.textContent = type.name;
+      card.appendChild(h2);
+      const grid = document.createElement('div');
+      grid.className = 'chip-grid';
+      type.rooms.forEach(room => {
+        const chip = document.createElement('div');
+        chip.className = 'chip' + (status[room]===1 ? ' full' : status[room]===2 ? ' stay' : '');
+        chip.innerHTML = room + (status[room]===1 ? '<span class="tag">FULL</span>' : status[room]===2 ? '<span class="tag">STAY</span>' : '');
+        chip.onclick = () => { status[room] = (status[room] + 1) % 3; render(); };
+        grid.appendChild(chip);
+      });
+      card.appendChild(grid);
+      typeCardsEl.appendChild(card);
+    });
+  }
+
+  function resetAll(){
+    ROOM_TYPES.forEach(t => t.rooms.forEach(r => status[r] = 0));
+    render();
+  }
+
+  function buildBlock(label, code, cssClass){
+    let html = `<div class="block-title ${cssClass}">${label}</div>`;
+    let any = false;
+    ROOM_TYPES.forEach(type => {
+      const matches = type.rooms.filter(r => status[r] === code);
+      if(matches.length === 0) return;
+      any = true;
+      html += `<div class="type-heading">${type.name}</div>`;
+      html += `<table class="roomtable"><thead><tr>
+        <th>Room No</th><th>Housekeeper Name</th><th>Completed</th><th>Supervisor Check</th><th>Signature</th>
+      </tr></thead><tbody>`;
+      matches.forEach(r => {
+        html += `<tr>
+          <td class="roomno">${r}</td>
+          <td class="blank-cell">&nbsp;</td>
+          <td class="blank-cell">&nbsp;</td>
+          <td class="blank-cell">&nbsp;</td>
+          <td class="blank-cell">&nbsp;</td>
+        </tr>`;
+      });
+      html += `</tbody></table>`;
+    });
+    if(!any){
+      html += `<div class="empty-note">No rooms assigned to ${label.toLowerCase()} tonight.</div>`;
+    }
+    return html;
+  }
+
+  function showSheet(){
+    const today = new Date().toLocaleDateString('en-CA', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+    let html = `<h1>Maritime Inn Antigonish</h1><div class="meta">Housekeeping Room Cleaning Log — ${today}</div>`;
+    html += buildBlock('Full Clean', 1, 'full');
+    html += buildBlock('Stay Clean', 2, 'stay');
+    document.getElementById('sheetContent').innerHTML = html;
+    document.getElementById('setupView').style.display = 'none';
+    document.getElementById('sheetView').style.display = 'block';
+    window.scrollTo(0,0);
+  }
+
+  function backToSetup(){
+    document.getElementById('sheetView').style.display = 'none';
+    document.getElementById('setupView').style.display = 'block';
+  }
+
+  document.getElementById('dateLabel').textContent = new Date().toLocaleDateString('en-CA', { weekday:'long', month:'long', day:'numeric' });
+  render();
+</script>
+
+</body>
+</html>
