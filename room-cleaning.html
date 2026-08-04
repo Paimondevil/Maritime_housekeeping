@@ -242,22 +242,29 @@
 
   .notes-box{
     margin-top:6px;
-    border:1.5px solid var(--line-strong);
-    border-radius:6px;
-    padding:4px 10px 5px;
+    padding:4px 2px 5px;
   }
   .notes-box .label{
     font-family:'Inter',sans-serif;
     font-weight:700;
     font-size:9px;
-    text-transform:uppercase;
-    letter-spacing:0.05em;
+    letter-spacing:0.03em;
     color:var(--navy-dim);
     margin-bottom:3px;
   }
   .notes-box .space{
     height:45px;
   }
+
+  /* ---- Page 2: static daily task + break log, always prints on the back ---- */
+  .page2{
+    page-break-before: always;
+    padding-top: 4px;
+  }
+  .page2 .block-title{margin-top:0;}
+  .page2 .block-title.tasks{background:var(--gold-bg);color:#5c3f10;}
+  .page2 .block-title.breaks{background:var(--teal-bg);color:#173e3a;margin-top:14px;}
+  .page2 table.roomtable td{font-size:13px;}
   @page{ size: auto; margin: 4mm; }
   @media print{
     body{background:#fff;}
@@ -431,11 +438,11 @@
 
     if(showPriority){
       html += `<table class="roomtable"><thead><tr>
-        <th style="width:10%;">Type</th><th style="width:5%;">P</th><th style="width:6%;">Room</th><th style="width:27%;">Housekeeper</th><th style="width:7%;">Done</th><th style="width:9%;">Supv.</th><th>Signature</th>
+        <th style="width:10%;">Type</th><th style="width:5%;">P</th><th style="width:9%;">Room</th><th style="width:27%;">Housekeeper</th><th style="width:10%;">Done</th><th style="width:12%;">Supervisor</th><th>Signature</th>
       </tr></thead><tbody>`;
     } else {
       html += `<table class="roomtable"><thead><tr>
-        <th style="width:11%;">Type</th><th style="width:6%;">Room</th><th style="width:30%;">Housekeeper</th><th style="width:7%;">Done</th><th style="width:9%;">Supv.</th><th>Signature</th>
+        <th style="width:11%;">Type</th><th style="width:9%;">Room</th><th style="width:29%;">Housekeeper</th><th style="width:10%;">Done</th><th style="width:12%;">Supervisor</th><th>Signature</th>
       </tr></thead><tbody>`;
     }
 
@@ -462,6 +469,54 @@
     return html;
   }
 
+  function buildPage2(){
+    const tasks = [
+      "Downstairs Lobby — Vacuum",
+      "Downstairs Lobby — Mop",
+      "Upstairs — Vacuum",
+      "Men's Washroom",
+      "Women's Washroom",
+      "Employee Washroom",
+      "Laundry",
+      "Linen Room — Organized",
+      "Celtic Room",
+    ];
+    let html = `<div class="page2">`;
+    html += `<div class="block-title tasks">Daily Housekeeping Task Log</div>`;
+    html += `<table class="roomtable"><thead><tr>
+      <th style="width:30%;">Task</th><th style="width:26%;">Completed</th><th style="width:24%;">Employee Name</th><th>Supervisor Initial</th>
+    </tr></thead><tbody>`;
+    tasks.forEach(t => {
+      html += `<tr>
+        <td>${t}</td>
+        <td class="blank-cell">&nbsp;</td>
+        <td class="blank-cell">&nbsp;</td>
+        <td class="blank-cell">&nbsp;</td>
+      </tr>`;
+    });
+    html += `</tbody></table>`;
+
+    html += `<div class="block-title breaks">Employee Break Log</div>`;
+    html += `<table class="roomtable"><thead><tr>
+      <th style="width:30%;">Employee Name</th><th style="width:20%;">Break Start</th><th style="width:20%;">Break End</th><th>Signature</th>
+    </tr></thead><tbody>`;
+    for(let i = 0; i < 8; i++){
+      html += `<tr>
+        <td class="blank-cell">&nbsp;</td>
+        <td class="blank-cell">&nbsp;</td>
+        <td class="blank-cell">&nbsp;</td>
+        <td class="blank-cell">&nbsp;</td>
+      </tr>`;
+    }
+    html += `</tbody></table>`;
+    html += `<div class="notes-box">
+      <div class="label">*NOTES</div>
+      <div class="space"></div>
+    </div>`;
+    html += `</div>`;
+    return html;
+  }
+
   function showSheet(){
     const today = new Date().toLocaleDateString('en-CA', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
     let html = `<div class="sheet-head">
@@ -471,9 +526,10 @@
     html += buildBlock('Full Clean', 1, 'full', true);
     html += buildBlock('Stay Clean', 2, 'stay', false);
     html += `<div class="notes-box">
-      <div class="label">Notes</div>
+      <div class="label">*KEYS</div>
       <div class="space"></div>
     </div>`;
+    html += buildPage2();
     document.getElementById('sheetContent').innerHTML = html;
     document.getElementById('setupView').style.display = 'none';
     document.getElementById('priorityView').style.display = 'none';
