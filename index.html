@@ -471,28 +471,49 @@
 
   function buildPage2(){
     const tasks = [
-      "Downstairs Lobby — Vacuum",
-      "Downstairs Lobby — Mop",
-      "Upstairs — Vacuum",
       "Men's Washroom",
       "Women's Washroom",
       "Employee Washroom",
+      "Downstairs Lobby — Vacuum",
+      "Downstairs Lobby — Mop",
+      "Upstairs — Vacuum",
       "Laundry",
       "Linen Room — Organized",
       "Celtic Room",
     ];
     let html = `<div class="page2">`;
     html += `<div class="block-title tasks">Daily Housekeeping Task Log</div>`;
-    html += `<table class="roomtable"><thead><tr>
-      <th style="width:30%;">Task</th><th style="width:26%;">Completed</th><th style="width:24%;">Employee Name</th><th>Supervisor Initial</th>
-    </tr></thead><tbody>`;
+    html += `<table class="roomtable">
+      <colgroup>
+        <col style="width:20%;">
+        <col style="width:8%;"><col style="width:8%;"><col style="width:8%;"><col style="width:8%;">
+        <col style="width:8%;"><col style="width:8%;"><col style="width:8%;"><col style="width:8%;">
+        <col style="width:16%;">
+      </colgroup>
+      <thead>
+        <tr>
+          <th rowspan="2">Task</th>
+          <th colspan="4">Completed</th>
+          <th colspan="4">Employee Name</th>
+          <th rowspan="2">Supervisor Initial</th>
+        </tr>
+        <tr>
+          <th>9AM</th><th>11AM</th><th>1PM</th><th>3PM</th>
+          <th>9AM</th><th>11AM</th><th>1PM</th><th>3PM</th>
+        </tr>
+      </thead>
+      <tbody>`;
     tasks.forEach(t => {
-      html += `<tr>
-        <td>${t}</td>
-        <td class="blank-cell">&nbsp;</td>
-        <td class="blank-cell">&nbsp;</td>
-        <td class="blank-cell">&nbsp;</td>
-      </tr>`;
+      const isWashroom = t.includes('Washroom');
+      html += `<tr><td>${t}</td>`;
+      if(isWashroom){
+        html += `<td class="blank-cell">&nbsp;</td><td class="blank-cell">&nbsp;</td><td class="blank-cell">&nbsp;</td><td class="blank-cell">&nbsp;</td>`;
+        html += `<td class="blank-cell">&nbsp;</td><td class="blank-cell">&nbsp;</td><td class="blank-cell">&nbsp;</td><td class="blank-cell">&nbsp;</td>`;
+      } else {
+        html += `<td class="blank-cell" colspan="4">&nbsp;</td>`;
+        html += `<td class="blank-cell" colspan="4">&nbsp;</td>`;
+      }
+      html += `<td class="blank-cell">&nbsp;</td></tr>`;
     });
     html += `</tbody></table>`;
 
