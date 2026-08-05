@@ -181,9 +181,10 @@
   .block-title{
     font-family:'Fraunces',serif;
     font-weight:700;
-    font-size:12.5px;
+    font-size:15px;
+    text-align:center;
     letter-spacing:0.02em;
-    padding:3px 9px;
+    padding:4px 9px;
     border-radius:5px;
     margin:0 0 4px;
   }
@@ -197,7 +198,13 @@
     table-layout:fixed;
   }
   table.roomtable th, table.roomtable td{
+    border-right:2.5px solid #000;
+  }
+  table.roomtable th.subcol, table.roomtable td.subcol{
     border-right:1px solid var(--line);
+  }
+  table.roomtable th.groupstart, table.roomtable td.groupstart{
+    border-left:2.5px solid #000;
   }
   table.roomtable th:last-child, table.roomtable td:last-child{
     border-right:none;
@@ -220,6 +227,9 @@
     line-height:1.15;
   }
   table.roomtable tr{page-break-inside:avoid;}
+  table.roomtable tr.group-top td{border-top:3px solid #000;}
+  table.roomtable tr.group-bottom td{border-bottom:3px solid #000;}
+  table.roomtable td.group-bottom{border-bottom:3px solid #000;}
   table.roomtable td.typecell{
     font-family:'Inter',sans-serif;
     font-weight:700;
@@ -253,7 +263,7 @@
     margin-bottom:3px;
   }
   .notes-box .space{
-    height:15px;
+    height:0px;
   }
 
   /* ---- Page 2: static daily task + break log, always prints on the back ---- */
@@ -265,6 +275,8 @@
   .page2 .block-title.tasks{background:var(--gold-bg);color:#5c3f10;}
   .page2 .block-title.breaks{background:var(--teal-bg);color:#173e3a;margin-top:14px;}
   .page2 table.roomtable td{font-size:13px;}
+  .page2 table.roomtable{border-top:3px solid #000;}
+  .page2 table.roomtable td{border-top:3px solid #000; border-bottom:3px solid #000;}
   @page{ size: auto; margin: 4mm; }
   @media print{
     body{background:#fff;}
@@ -447,20 +459,22 @@
           <th style="width:9%;" rowspan="2">Room</th>
           <th style="width:29%;" rowspan="2">Housekeeper</th>
           <th style="width:12%;" colspan="2">Status</th>
-          <th style="width:12%;" rowspan="2">Supervisor</th>
+          <th style="width:12%;" rowspan="2" class="groupstart">Supervisor</th>
           <th rowspan="2">Signature</th>
         </tr>
         <tr>
-          <th style="width:6%;">Done</th><th style="width:6%;">DND</th>
+          <th style="width:6%;" class="subcol">Done</th><th style="width:6%;">DND</th>
         </tr>
       </thead><tbody>`;
     }
 
     groups.forEach(g => {
       g.rooms.forEach((r, i) => {
-        html += `<tr>`;
-        if(i === 0){
-          html += `<td class="typecell" rowspan="${g.rooms.length}">${g.name}</td>`;
+        const isFirst = i === 0;
+        const isLast = i === g.rooms.length - 1;
+        html += `<tr class="${isFirst ? 'group-top' : ''} ${isLast ? 'group-bottom' : ''}">`;
+        if(isFirst){
+          html += `<td class="typecell${isLast ? ' group-bottom' : ''}" rowspan="${g.rooms.length}">${g.name}</td>`;
         }
         if(showPriority){
           html += `<td class="prioritycell">${priority[r] ? 'P' : ''}</td>`;
@@ -471,13 +485,15 @@
           html += `<td class="blank-cell">&nbsp;</td>`;
         }
         html += `
-          <td class="blank-cell">&nbsp;</td>
           <td class="blank-cell">&nbsp;</td>`;
-        if(!showPriority){
+        if(showPriority){
           html += `<td class="blank-cell">&nbsp;</td>`;
+        } else {
+          html += `<td class="blank-cell subcol">&nbsp;</td>
+          <td class="blank-cell">&nbsp;</td>`;
         }
         html += `
-          <td class="blank-cell">&nbsp;</td>
+          <td class="blank-cell${showPriority ? '' : ' groupstart'}">&nbsp;</td>
           <td class="blank-cell">&nbsp;</td>
         </tr>`;
       });
@@ -516,8 +532,8 @@
           <th rowspan="2">Supervisor Initial</th>
         </tr>
         <tr>
-          <th>9AM</th><th>11AM</th><th>1PM</th><th>3PM</th>
-          <th>9AM</th><th>11AM</th><th>1PM</th><th>3PM</th>
+          <th class="subcol">9AM</th><th class="subcol">11AM</th><th class="subcol">1PM</th><th>3PM</th>
+          <th class="subcol groupstart">9AM</th><th class="subcol">11AM</th><th class="subcol">1PM</th><th>3PM</th>
         </tr>
       </thead>
       <tbody>`;
@@ -525,11 +541,11 @@
       const isWashroom = t.includes('Washroom');
       html += `<tr><td>${t}</td>`;
       if(isWashroom){
-        html += `<td class="blank-cell">&nbsp;</td><td class="blank-cell">&nbsp;</td><td class="blank-cell">&nbsp;</td><td class="blank-cell">&nbsp;</td>`;
-        html += `<td class="blank-cell">&nbsp;</td><td class="blank-cell">&nbsp;</td><td class="blank-cell">&nbsp;</td><td class="blank-cell">&nbsp;</td>`;
+        html += `<td class="blank-cell subcol">&nbsp;</td><td class="blank-cell subcol">&nbsp;</td><td class="blank-cell subcol">&nbsp;</td><td class="blank-cell">&nbsp;</td>`;
+        html += `<td class="blank-cell subcol groupstart">&nbsp;</td><td class="blank-cell subcol">&nbsp;</td><td class="blank-cell subcol">&nbsp;</td><td class="blank-cell">&nbsp;</td>`;
       } else {
         html += `<td class="blank-cell" colspan="4">&nbsp;</td>`;
-        html += `<td class="blank-cell" colspan="4">&nbsp;</td>`;
+        html += `<td class="blank-cell groupstart" colspan="4">&nbsp;</td>`;
       }
       html += `<td class="blank-cell">&nbsp;</td></tr>`;
     });
