@@ -253,7 +253,7 @@
     margin-bottom:3px;
   }
   .notes-box .space{
-    height:45px;
+    height:15px;
   }
 
   /* ---- Page 2: static daily task + break log, always prints on the back ---- */
@@ -438,12 +438,22 @@
 
     if(showPriority){
       html += `<table class="roomtable"><thead><tr>
-        <th style="width:10%;">Type</th><th style="width:5%;">P</th><th style="width:9%;">Room</th><th style="width:5%;">Gone</th><th style="width:27%;">Housekeeper</th><th style="width:10%;">Done</th><th style="width:12%;">Supervisor</th><th>Signature</th>
+        <th style="width:10%;">Type</th><th style="width:5%;">P</th><th style="width:9%;">Room</th><th style="width:5%;">Gone</th><th style="width:27%;">Housekeeper</th><th style="width:10%;">Status</th><th style="width:12%;">Supervisor</th><th>Signature</th>
       </tr></thead><tbody>`;
     } else {
-      html += `<table class="roomtable"><thead><tr>
-        <th style="width:11%;">Type</th><th style="width:9%;">Room</th><th style="width:29%;">Housekeeper</th><th style="width:10%;">Done</th><th style="width:12%;">Supervisor</th><th>Signature</th>
-      </tr></thead><tbody>`;
+      html += `<table class="roomtable"><thead>
+        <tr>
+          <th style="width:11%;" rowspan="2">Type</th>
+          <th style="width:9%;" rowspan="2">Room</th>
+          <th style="width:29%;" rowspan="2">Housekeeper</th>
+          <th style="width:12%;" colspan="2">Status</th>
+          <th style="width:12%;" rowspan="2">Supervisor</th>
+          <th rowspan="2">Signature</th>
+        </tr>
+        <tr>
+          <th style="width:6%;">Done</th><th style="width:6%;">DND</th>
+        </tr>
+      </thead><tbody>`;
     }
 
     groups.forEach(g => {
@@ -462,7 +472,11 @@
         }
         html += `
           <td class="blank-cell">&nbsp;</td>
-          <td class="blank-cell">&nbsp;</td>
+          <td class="blank-cell">&nbsp;</td>`;
+        if(!showPriority){
+          html += `<td class="blank-cell">&nbsp;</td>`;
+        }
+        html += `
           <td class="blank-cell">&nbsp;</td>
           <td class="blank-cell">&nbsp;</td>
         </tr>`;
